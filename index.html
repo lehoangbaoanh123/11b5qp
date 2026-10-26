@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ôn Tập GDQP 11 - Trắc Nghiệm Trực Tuyến</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="description" content="Trang web thi thử trắc nghiệm Giáo dục Quốc phòng & An ninh lớp 11, đồng hồ đếm ngược 45 phút, xáo trộn đáp án ngẫu nhiên, chấm điểm chi tiết.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation Bar (Sticky) -->
+  <header class="top-nav" id="topNav">
+    <div class="nav-content">
+      <div class="nav-left">
+        <span class="exam-title-badge">GDQP 11</span>
+        <button type="button" class="btn-nav-grid" id="btnToggleNav" title="Bảng danh sách câu hỏi" aria-label="Bảng câu hỏi">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span class="nav-progress-text" id="progressSummary">0/52</span>
+        </button>
+      </div>
+
+      <div class="nav-center">
+        <div class="timer-badge" id="timerBadge" role="timer" aria-live="polite">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span id="timerDisplay">45:00</span>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <button type="button" class="btn-submit-nav" id="btnNavSubmit">Nộp bài</button>
+      </div>
+    </div>
+
+    <!-- Progress Line -->
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBarFill"></div>
+    </div>
+  </header>
+
+  <!-- Quick Question Drawer / Modal for Mobile -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="question-drawer" id="questionDrawer" aria-hidden="true">
+    <div class="drawer-header">
+      <div class="drawer-title-group">
+        <h3>Danh Sách Câu Hỏi</h3>
+        <p class="drawer-sub">Chạm vào số câu để chuyển nhanh</p>
+      </div>
+      <button type="button" class="btn-close-drawer" id="btnCloseDrawer" aria-label="Đóng">&times;</button>
+    </div>
+    
+    <div class="drawer-legend">
+      <div class="legend-item"><span class="dot dot-answered"></span> Đã làm</div>
+      <div class="legend-item"><span class="dot dot-unanswered"></span> Chưa làm</div>
+    </div>
+
+    <div class="drawer-grid" id="drawerGrid">
+      <!-- Grid buttons 1..52 generated dynamically -->
+    </div>
+  </aside>
+
+  <!-- Main Content Container -->
+  <main class="main-container">
+
+    <!-- Exam Screen -->
+    <section class="exam-screen" id="examScreen">
+      <!-- Info Header -->
+      <header class="exam-header-card">
+        <div class="header-tags">
+          <span class="tag">ĐỀ CƯƠNG ÔN TẬP GK1</span>
+          <span class="tag">52 CÂU HỎI CHUẨN</span>
+          <span class="tag">45 PHÚT</span>
+        </div>
+        <h1 class="header-title">Trắc Nghiệm GDQP & An Ninh Lớp 11</h1>
+        <p class="header-desc">
+          Thứ tự các câu hỏi giữ nguyên theo đề cương gốc. Các đáp án A, B, C, D được hệ thống xáo trộn ngẫu nhiên để rèn luyện tư duy thực chất.
+        </p>
+      </header>
+
+      <!-- Questions List by Lesson -->
+      <div class="questions-wrapper" id="questionsContainer">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Bottom Floating Submit Bar on Mobile -->
+      <footer class="bottom-action-bar">
+        <div class="bottom-info">
+          Đã chọn: <strong id="bottomAnsweredCount">0</strong> / 52 câu
+        </div>
+        <button type="button" class="btn-main-submit" id="btnBottomSubmit">
+          Nộp bài chấm điểm
+        </button>
+      </footer>
+    </section>
+
+    <!-- Results Screen (Hidden initially) -->
+    <section class="results-screen hidden" id="resultsScreen">
+      <div class="results-card">
+        <div class="results-badge-hero">KẾT QUẢ BÀI THI</div>
+        <h2 class="results-headline" id="resultHeadline">Hoàn Thành Bài Ôn Tập</h2>
+        
+        <div class="score-display">
+          <span class="score-number" id="resultScore">0</span>
+          <span class="score-total">/ 52</span>
+        </div>
+        <div class="score-percentage" id="resultPercentage">Độ chính xác: 0%</div>
+
+        <div class="results-stats-grid">
+          <div class="stat-box">
+            <span class="stat-value correct-color" id="resultCorrect">0</span>
+            <span class="stat-label">Câu đúng</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-value wrong-color" id="resultWrong">0</span>
+            <span class="stat-label">Câu sai</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-value unanswered-color" id="resultUnanswered">0</span>
+            <span class="stat-label">Chưa làm</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-value" id="resultTime">00:00</span>
+            <span class="stat-label">Thời gian làm</span>
+          </div>
+        </div>
+
+        <div class="results-action-row">
+          <button type="button" class="btn-action-primary" id="btnRetake">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+            </svg>
+            Làm lại bài thi (Tráo lại đáp án)
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Controls for Review -->
+      <div class="review-filter-bar">
+        <span class="filter-title">Xem lại bài làm:</span>
+        <div class="filter-buttons">
+          <button type="button" class="btn-filter active" data-filter="all">Tất cả (52)</button>
+          <button type="button" class="btn-filter" data-filter="wrong" id="filterWrongBtn">Câu sai (0)</button>
+          <button type="button" class="btn-filter" data-filter="correct" id="filterCorrectBtn">Câu đúng (0)</button>
+        </div>
+      </div>
+
+      <!-- Review Questions List -->
+      <div class="review-list" id="reviewList">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Submit Confirmation Modal -->
+  <div class="modal-backdrop hidden" id="confirmModal">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h3 class="modal-title" id="modalTitle">Xác nhận nộp bài</h3>
+      <p class="modal-message" id="modalMessage">
+        Bạn có chắc chắn muốn nộp bài thi?
+      </p>
+      <div class="modal-actions">
+        <button type="button" class="btn-modal-cancel" id="btnModalCancel">Tiếp tục làm bài</button>
+        <button type="button" class="btn-modal-confirm" id="btnModalConfirm">Xác nhận nộp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="questions.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
